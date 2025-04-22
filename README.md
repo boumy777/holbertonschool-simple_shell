@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 0x00. Simple Shell
 
 ### Description
@@ -25,9 +26,47 @@ Only commands with full paths are supported (e.g. `/bin/ls`).
 ### Example
 
 #cisfun$ /bin/ls main.c shell shell.c
+=======
+simple shell
+
+Description
+>>>>>>> 1989c33 (correction du problème avec Betty)
 
 
 
 
+<<<<<<< HEAD
 ---
 
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+boumy777
+stani78bks
+>>>>>>> 1989c33 (correction du problème avec Betty)

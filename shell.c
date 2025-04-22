@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+<<<<<<< HEAD
 
 /**
  * prompt_user_for_input - Affiche un prompt et lit l'entrée de l'utilisateur.
@@ -84,6 +85,95 @@ int main(void)
 	printf("Command executed successfully\n");
 	clean_up(input);
 
+=======
+#include <string.h>
+#include <sys/wait.h>
+#include "main.h"
+
+#define PROMPT "#cisfun$ "
+
+/**
+ * read_command - Reads a line from stdin
+ * Return: The line read (dynamically allocated), or NULL on EOF
+ */
+char *read_command(void)
+{
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t nread;
+
+	if (isatty(STDIN_FILENO))
+		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+
+	nread = getline(&line, &len, stdin);
+	if (nread == -1)
+	{
+		free(line);
+		return (NULL);
+	}
+
+	if (line[nread - 1] == '\n')
+		line[nread - 1] = '\0';
+
+	if (line[0] == '\0')
+	{
+		free(line);
+		return (NULL);
+	}
+
+	return (line);
+}
+
+/**
+ * execute_command - Forks and executes a command
+ * @cmd: command to execute
+ */
+void execute_command(char *cmd)
+{
+	pid_t pid;
+	char *argv[2];
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		return;
+	}
+	if (pid == 0)
+	{
+		argv[0] = cmd;
+		argv[1] = NULL;
+		execve(cmd, argv, environ);
+		perror("./shell");
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		wait(NULL);
+	}
+}
+
+/**
+ * main - Entry point
+ * Return: 0 on success
+ */
+int main(void)
+{
+	char *line;
+
+	while (1)
+	{
+		line = read_command();
+		if (!line)
+		{
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
+			break;
+		}
+		execute_command(line);
+		free(line);
+	}
+>>>>>>> 1989c33 (correction du problème avec Betty)
 	return (0);
 }
 
