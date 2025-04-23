@@ -1,56 +1,40 @@
-#include <sys/wait.h>
-#include "main.h"
+#include "shell.h"
 
 /**
- * display_prompt - Affiche le prompt du shell
+ * signal_handler - Handles Ctrl+C (SIGINT) input.
+ * @sig: signal number.
  */
-void display_prompt(void)
+void signal_handler(int sig)
 {
-	write(STDOUT_FILENO, "#cisfun$ ", 9);
-}
-
-/**
- * read_line - Lit une ligne depuis l'entrée standard
- * Return: ligne lue (malloc), NULL si Ctrl+D
- */
-char *read_line(void)
-{
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t nread;
-
-	nread = getline(&line, &len, stdin);
-	if (nread == -1)
+	if (sig == SIGINT)
 	{
-		free(line);
-		return (NULL);
+		write(STDOUT_FILENO, "\n#cisfun$ ", 10);
 	}
-
-	if (line[nread - 1] == '\n')
-		line[nread - 1] = '\0';
-
-	return (line);
 }
 
 /**
- * execute_command - Exécute une commande simple avec execve
- * @cmd: commande (chemin absolu)
+ * execute_command - Forks and executes a command using execve.
+ * @command: The command to execute.
  */
-void execute_command(char *cmd)
+void execute_command(char *command)
 {
 	pid_t pid = fork();
-	char *argv[] = {cmd, NULL};
+	char *argv[2];
 
 	if (pid == -1)
 	{
 		perror("fork");
 		return;
 	}
+
 	if (pid == 0)
 	{
-		if (execve(cmd, argv, environ) == -1)
+		argv[0] = command;
+		argv[1] = NULL;
+
+		if (execve(command, argv, environ) == -1)
 		{
-			perror("./shell");
+			perror(command);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -61,28 +45,39 @@ void execute_command(char *cmd)
 }
 
 /**
- * main - Point d'entrée du shell
- * Return: 0
+ * main - Entry point of the simple shell program.
+ * Return: Always 0.
  */
 int main(void)
 {
-	char *line;
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t line_size;
+	char *prompt = "#cisfun$ ";
+
+	signal(SIGINT, signal_handler);
 
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			display_prompt();
+		write(STDOUT_FILENO, prompt, strlen(prompt));
+		line_size = getline(&line, &len, stdin);
 
-		line = read_line();
-		if (line == NULL)
+		if (line_size == -1)
 		{
-			if (isatty(STDIN_FILENO))
-				write(STDOUT_FILENO, "\n", 1);
-			break;
+			write(STDOUT_FILENO, "\n", 1);
+			free(line);
+			exit(EXIT_SUCCESS);
 		}
-		execute_command(line);
-		free(line);
+
+		line[strcspn(line, "\n")] = 0;
+
+		if (strlen(line) > 0)
+		{
+			execute_command(line);
+		}
 	}
+
+	free(line);
 	return (0);
 }
 

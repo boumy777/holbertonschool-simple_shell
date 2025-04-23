@@ -3,11 +3,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 
-int main(void);
+extern char **environ;
+
+void signal_handler(int sig);
+void execute_command(char *command);
 
 #endif /* SHELL_H */
 
