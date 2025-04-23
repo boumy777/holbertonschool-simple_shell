@@ -1,28 +1,27 @@
 #include "utils.h"
-#include <stdio.h>
-#include <stdlib.h>
+
 /**
  * main - Entry point for the simple shell
  *
- * Return: Always 0 (Success)
+ * Return: Always 0
  */
-
 int main(void)
 {
-	char *line;
+	char *line = NULL;
 
 	while (1)
 	{
 		display_prompt();
 		line = read_line();
-		if (!line)
+		if (line == NULL)
 		{
-			printf("\n");
+			write(1, "\n", 1);
 			break;
 		}
-		printf(">> %s", line);
+		execute_command(line);
 		free(line);
 	}
+
 	return (0);
 }
 
