@@ -21,16 +21,37 @@ void signal_handler(int signum)
  *
  * Return: Exit status of the command
  */
-int execute_command(char *command)
+int execute_command(char **args, info_t *info)
 {
+	pid_t pid;
 	int status;
 
-	if (!command)
+	(void)info;
+
+	if (args[0] == NULL)
 		return (1);
 
-	status = system(command);
-	return (status);
+	pid = fork();
+	if (pid == 0)
+	{
+		if (execve(args[0], args, environ) == -1)
+			perror("execve");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid < 0)
+	{
+		perror("fork");
+	}
+	else
+	{
+		do {
+			waitpid(pid, &status, WUNTRACED);
+		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+	}
+
+	return (1);
 }
+
 
 /**
  * parse_input - Parses command line input

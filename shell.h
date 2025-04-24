@@ -45,6 +45,7 @@ typedef struct builtin
 
 /* Main shell functions */
 void handle_sigint(int sig);
+void display_prompt(void);
 
 /* Input reading and parsing functions */
 char *read_line(info_t *info);
@@ -72,3 +73,4 @@ char *_strcat(char *dest, char *src);
 char *_getenv(const char *name);
 
 #endif /* SHELL_H */
+
